@@ -1,0 +1,9 @@
+0.7
+2020.2
+May 22 2025
+00:13:55
+Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.sim/sim_1/behav/xsim/glbl.v,1741209010,verilog,,,,glbl,,,,,,,,
+Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.srcs/sim_1/imports/sim/tb_mic_recorder.v,1784361990,verilog,,,,tb_mic_recorder,,,../../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef,,,,,
+Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.srcs/sources_1/imports/rtl/audio_buffer.v,1784349716,verilog,,Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.srcs/sources_1/imports/rtl/mic_recorder.v,,audio_buffer,,,../../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef,,,,,
+Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.srcs/sources_1/imports/rtl/mic_recorder.v,1784350275,verilog,,Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.srcs/sources_1/imports/rtl/pdm_decoder.v,,mic_recorder,,,../../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef,,,,,
+Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.srcs/sources_1/imports/rtl/pdm_decoder.v,1784349714,verilog,,Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.srcs/sim_1/imports/sim/tb_mic_recorder.v,,pdm_decoder,,,../../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef,,,,,

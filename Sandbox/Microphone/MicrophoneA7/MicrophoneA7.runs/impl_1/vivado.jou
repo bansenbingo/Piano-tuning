@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2025.1 (64-bit)
+# SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+# IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+# SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+# Start of session at: Sat Jul 18 16:43:27 2026
+# Process ID         : 100072
+# Current directory  : Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.runs/impl_1
+# Command line       : vivado.exe -log mic_recorder.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source mic_recorder.tcl -notrace
+# Log file           : Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.runs/impl_1/mic_recorder.vdi
+# Journal file       : Z:/Piano-tuning/Sandbox/Microphone/MicrophoneA7/MicrophoneA7.runs/impl_1\vivado.jou
+# Running On         : LAPTOP-6STAFKCC
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26100
+# Processor Detail   : AMD Ryzen 9 7940HX with Radeon Graphics        
+# CPU Frequency      : 2395 MHz
+# CPU Physical cores : 16
+# CPU Logical cores  : 32
+# Host memory        : 16337 MB
+# Swap memory        : 23622 MB
+# Total Virtual      : 39960 MB
+# Available Virtual  : 11066 MB
+#-----------------------------------------------------------
+source mic_recorder.tcl -notrace
