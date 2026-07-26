@@ -289,8 +289,10 @@ module mic_recorder #(
                     if (send_count == record_count - 1'b1) begin
                         send_done <= 1;
                     end else begin
-                        send_count  <= send_count + 1;
-                        send_issued <= 0;
+                        // 地址推进后需等待一拍，让 audio_buffer 的寄存读输出更新
+                        send_count   <= send_count + 1;
+                        send_issued  <= 0;
+                        send_startup <= 1;
                     end
                 end
             end

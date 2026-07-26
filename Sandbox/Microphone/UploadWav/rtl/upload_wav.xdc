@@ -43,4 +43,5 @@ set_property SLEW SLOW [get_ports { AUD_PWM }];
 set_property -dict { PACKAGE_PIN D12   IOSTANDARD LVCMOS33 } [get_ports { AUD_SD }];
 
 ## USB-UART Bridge (FTDI FT2232HQ)
-set_property -dict { PACKAGE_PIN C4    IOSTANDARD LVCMOS33 } [get_ports { UART_TXD }];
+## D4 = uart_rxd_out：FPGA -> FTDI -> PC 的发送线（C4 是 PC -> FPGA 的接收线，不能用于发送）
+set_property -dict { PACKAGE_PIN D4    IOSTANDARD LVCMOS33 } [get_ports { UART_TXD }];

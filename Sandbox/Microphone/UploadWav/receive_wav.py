@@ -22,7 +22,10 @@ import wave
 import struct
 import os
 
-PORT        = "COM15"
+# 端口可通过命令行覆盖: python receive_wav.py COM7
+# Windows: COMx（FT2232 会出现两个 COM 口，UART 是编号较大的那个）
+# macOS:   /dev/cu.usbserial-XXXXB   Linux: /dev/ttyUSB1
+PORT        = sys.argv[1] if len(sys.argv) > 1 else "COM15"
 BAUD        = 921600
 SAMPLE_RATE = 19531
 
@@ -40,7 +43,7 @@ def main():
         print("请检查: 1) USB 线已连接  2) COM 端口号是否正确  3) 串口未被其他程序占用")
         sys.exit(1)
 
-    print("等待 FPGA 传输... (在 A7 上按下 BTNC 开始发送, 按 Ctrl+C 结束等待)")
+    print("等待 FPGA 传输... (在 A7 上先录音 SW0, 再上拨 SW14 开始发送)")
     print("按 Ctrl+C 可随时中断\n")
 
     raw_data = bytearray()
@@ -48,7 +51,11 @@ def main():
         while True:
             chunk = ser.read(4096)
             if not chunk:
-                break
+                if raw_data:
+                    break          # 数据流已结束
+                continue           # 尚未开始, 继续等待
+            if not raw_data:
+                ser.timeout = 20    # 收到首字节后, 20 秒无数据即视为传输结束
             raw_data.extend(chunk)
             print(f"  已接收 {len(raw_data)} 字节", end="\r")
     except KeyboardInterrupt:
