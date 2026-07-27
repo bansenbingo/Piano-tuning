@@ -1,0 +1,23 @@
+#!/bin/sh
+
+message_file=$1
+subject=$(LC_ALL=C sed -n '1p' "$message_file")
+expected_branch=
+
+if printf '%s\n' "$subject" | LC_ALL=C grep -Eq '^0\.[0-9]+(\.[0-9]+)?([[:space:]]|$)'; then
+    expected_branch=main
+elif printf '%s\n' "$subject" | LC_ALL=C grep -Eq '^1\.[0-9]+(\.[0-9]+)?([[:space:]]|$)'; then
+    expected_branch=sandbox-audio-upload
+else
+    exit 0
+fi
+
+current_branch=$(git symbolic-ref --quiet --short HEAD) || current_branch='detached HEAD'
+
+if [ "$current_branch" != "$expected_branch" ]; then
+    printf '%s\n' \
+        "Commit rejected: messages beginning with this version must be committed on '$expected_branch'." \
+        "Current branch: '$current_branch'" \
+        "Commit message: '$subject'" >&2
+    exit 1
+fi
