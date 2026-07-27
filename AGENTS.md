@@ -12,7 +12,7 @@ This file is the persistent project memory for OpenCode agents working in this r
 
 - TBD: Record milestones, major implementation steps, and important decisions as they happen.
 - Do not use terminal-based Vivado synthesis, implementation, simulation, or hardware experiments for this project. Vivado-related changes must be validated by the user programming the board and reporting the observed results.
-- The repository-managed `commit-msg` hook requires commit subjects beginning with `0.x` or `0.x.x` to be committed on `main`, and subjects beginning with `1.x` or `1.x.x` to be committed on `sandbox-audio-upload`; enable it with `git config core.hooksPath .githooks` after cloning.
+- Versioned commit subjects beginning with `0.x` or `0.x.y` belong on `main`; subjects beginning with `1.x` or `1.x.y` belong on `sandbox-audio-upload`. Different topics increment the middle number (`1.6`, `1.7`); revisions to an earlier topic append a patch number (`1.4.3`). Current branch baselines are `main=0.5` and `sandbox-audio-upload=1.5`. Enable the repository hook with `git config core.hooksPath .githooks` after cloning.
 
 ## Design And Thinking
 
