@@ -4,19 +4,37 @@ message_file=$1
 subject=$(LC_ALL=C sed -n '1p' "$message_file")
 expected_branch=
 
-if printf '%s\n' "$subject" | LC_ALL=C grep -Eq '^0\.[0-9]+(\.[0-9]+){0,2}([[:space:]]|$)'; then
+if printf '%s\n' "$subject" | LC_ALL=C grep -Eq '^0\.[0-9]+(\.[0-9]+){0,1}[[:space:]]+'; then
     expected_branch=main
-elif printf '%s\n' "$subject" | LC_ALL=C grep -Eq '^1\.[0-9]+(\.[0-9]+){0,2}([[:space:]]|$)'; then
+elif printf '%s\n' "$subject" | LC_ALL=C grep -Eq '^1\.[0-9]+(\.[0-9]+){0,1}[[:space:]]+'; then
     expected_branch=sandbox-audio-upload
 else
-    exit 0
+    printf '%s\n' \
+        "Commit rejected: subject must begin with a version such as '0.6' or '1.6', followed by a space and description." >&2
+    exit 1
 fi
 
 current_branch=$(git symbolic-ref --quiet --short HEAD) || current_branch='detached HEAD'
 
-if [ "$current_branch" != "$expected_branch" ]; then
+if [ "$current_branch" = "main" ]; then
+    expected_prefix=0
+elif [ "$current_branch" = "sandbox-audio-upload" ]; then
+    expected_prefix=1
+elif git merge-base --is-ancestor "origin/main" HEAD 2>/dev/null; then
+    expected_prefix=0
+elif git merge-base --is-ancestor "origin/sandbox-audio-upload" HEAD 2>/dev/null; then
+    expected_prefix=1
+else
     printf '%s\n' \
-        "Commit rejected: messages beginning with this version must be committed on '$expected_branch'." \
+        "Commit rejected: cannot determine the version prefix for '$current_branch'." \
+        "Create the branch from main or sandbox-audio-upload, or document its prefix in COMMIT_CONVENTIONS.md and this hook." >&2
+    exit 1
+fi
+
+subject_prefix=$(printf '%s\n' "$subject" | LC_ALL=C cut -c1)
+if [ "$subject_prefix" != "$expected_prefix" ]; then
+    printf '%s\n' \
+        "Commit rejected: version prefix '$subject_prefix' does not match the required prefix '$expected_prefix' for '$current_branch'." \
         "Current branch: '$current_branch'" \
         "Commit message: '$subject'" >&2
     exit 1
