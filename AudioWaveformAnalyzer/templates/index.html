@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Audio Waveform Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="container">
+      <h1>Audio Waveform Analyzer</h1>
+      <p class="intro">2.0 工程初始化：钢琴音频样本目录</p>
+      <section class="card">
+        <h2>样本库</h2>
+        <p>当前录入的 M4A 钢琴音频将作为后续波形、FFT 和正弦波拟合的测试数据。</p>
+        <table>
+          <thead><tr><th>文件</th><th>编码</th><th>采样率</th><th>声道</th><th>时长</th></tr></thead>
+          <tbody id="samples"><tr><td colspan="5">正在读取样本目录…</td></tr></tbody>
+        </table>
+      </section>
+    </main>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

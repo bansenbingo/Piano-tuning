@@ -1,2 +1,11 @@
 .opencode/
 .DS_Store
+
+# Audio waveform analyzer runtime artifacts
+AudioWaveformAnalyzer/__pycache__/
+AudioWaveformAnalyzer/analyzer/__pycache__/
+AudioWaveformAnalyzer/tests/__pycache__/
+AudioWaveformAnalyzer/data/uploads/*
+AudioWaveformAnalyzer/outputs/*
+!AudioWaveformAnalyzer/data/uploads/.gitkeep
+!AudioWaveformAnalyzer/outputs/.gitkeep

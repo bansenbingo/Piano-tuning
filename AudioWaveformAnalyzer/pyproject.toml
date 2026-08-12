@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "audio-waveform-analyzer"
+version = "2.0.0"
+description = "Flask-based audio waveform and sinusoidal decomposition workspace."
+requires-python = ">=3.10"
+dependencies = [
+    "Flask>=3.0,<4",
+    "numpy>=1.26,<3",
+    "scipy>=1.11,<2",
+    "soundfile>=0.12,<1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "ruff>=0.6,<1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
