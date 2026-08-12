@@ -9,7 +9,6 @@ from flask import Flask, jsonify, render_template
 
 from .audio_io import AudioProbeError, list_audio_files
 
-
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 PIANO_DIR = PROJECT_DIR / "data" / "piano"
 

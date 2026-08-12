@@ -5,6 +5,7 @@
 AudioWaveformAnalyzer/__pycache__/
 AudioWaveformAnalyzer/analyzer/__pycache__/
 AudioWaveformAnalyzer/tests/__pycache__/
+AudioWaveformAnalyzer/*.egg-info/
 AudioWaveformAnalyzer/data/uploads/*
 AudioWaveformAnalyzer/outputs/*
 !AudioWaveformAnalyzer/data/uploads/.gitkeep

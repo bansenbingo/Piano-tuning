@@ -12,15 +12,18 @@ fitting features.
 
 ```bash
 cd AudioWaveformAnalyzer
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e '.[dev]'
+conda env create -f environment.yml
+conda activate audio-waveform-analyzer
 python -m analyzer.app
 ```
 
 Open <http://127.0.0.1:5000/> after the server starts.
 
 FFmpeg and `ffprobe` must be available on `PATH` for `.m4a` and `.mp3` files.
+
+The environment file installs Python and FFmpeg through conda-forge. Python
+packages declared in `pyproject.toml`, including Plotly for interactive plots,
+are installed with pip as part of environment creation.
 
 ## Current scope
 
