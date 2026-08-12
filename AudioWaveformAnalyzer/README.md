@@ -14,7 +14,7 @@ fitting features.
 cd AudioWaveformAnalyzer
 conda env create -f environment.yml
 conda activate audio-waveform-analyzer
-python -m analyzer.app
+python app.py
 ```
 
 Open <http://127.0.0.1:5000/> after the server starts.

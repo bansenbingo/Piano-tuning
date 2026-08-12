@@ -1,4 +1,4 @@
-"""Minimal Flask entry point for the audio waveform analyzer."""
+"""Top-level Flask launcher for `python app.py`."""
 
 from __future__ import annotations
 
@@ -7,9 +7,10 @@ from pathlib import Path
 
 from flask import Flask, jsonify, render_template
 
-from .audio_io import AudioProbeError, list_audio_files
+from analyzer.audio_io import AudioProbeError, list_audio_files
 
-PROJECT_DIR = Path(__file__).resolve().parent.parent
+
+PROJECT_DIR = Path(__file__).resolve().parent
 PIANO_DIR = PROJECT_DIR / "data" / "piano"
 
 
@@ -26,7 +27,7 @@ def create_app() -> Flask:
 
     @app.get("/health")
     def health():
-        return jsonify({"status": "ok", "version": "2.0.0"})
+        return jsonify({"status": "ok", "version": "2.2.0"})
 
     @app.get("/api/samples")
     def samples():
