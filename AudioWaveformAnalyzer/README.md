@@ -29,8 +29,23 @@ are installed with pip as part of environment creation.
 
 - Flask app skeleton with a health endpoint and piano-sample catalog.
 - M4A sample inventory and metadata inspection through `ffprobe`.
+- Lossless-after-decoding 32-bit float WAV copies in `data/piano_wav/`; the
+  original M4A files remain unchanged.
 - Reserved directories for uploaded files, generated analysis results, and
   technical documents under the repository-level `Reference/` directory.
 
 FFT decomposition, curve fitting, plots, and export are planned for subsequent
 `2.x` feature commits.
+
+## Converting audio to WAV
+
+The conversion keeps the source sample rate and channel count (no `-ar` or
+`-ac` conversion) and writes uncompressed `pcm_f32le` WAV files:
+
+```bash
+conda activate audio-waveform-analyzer
+python tools/convert_audio_to_wav.py data/piano data/piano_wav
+```
+
+M4A/AAC is already lossy before conversion; converting it to WAV cannot restore
+information removed by AAC, but it avoids adding another lossy generation.

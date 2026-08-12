@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "audio-waveform-analyzer"
-version = "2.1.1"
+version = "2.2.0"
 description = "Flask-based audio waveform and sinusoidal decomposition workspace."
 requires-python = ">=3.10"
 dependencies = [

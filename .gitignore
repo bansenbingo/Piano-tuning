@@ -7,6 +7,7 @@ AudioWaveformAnalyzer/analyzer/__pycache__/
 AudioWaveformAnalyzer/tests/__pycache__/
 AudioWaveformAnalyzer/*.egg-info/
 AudioWaveformAnalyzer/data/uploads/*
+AudioWaveformAnalyzer/data/piano_wav/*
 AudioWaveformAnalyzer/outputs/*
 !AudioWaveformAnalyzer/data/uploads/.gitkeep
 !AudioWaveformAnalyzer/outputs/.gitkeep
