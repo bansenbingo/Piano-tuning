@@ -12,7 +12,6 @@ const PALETTE = [
 ];
 
 const fileInput = document.querySelector("#file-input");
-const fileHelp = document.querySelector("#file-help");
 const denoiseToggle = document.querySelector("#denoise");
 const lowcutInput = document.querySelector("#lowcut");
 const highcutInput = document.querySelector("#highcut");
@@ -120,9 +119,3 @@ numComponents.addEventListener("input", () => {
   numValue.textContent = numComponents.value;
 });
 analyzeBtn.addEventListener("click", analyze);
-fileInput.addEventListener("change", () => {
-  const file = fileInput.files[0];
-  fileHelp.textContent = file
-    ? `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`
-    : "支持 WAV / M4A · M4A 会自动转换为 WAV";
-});

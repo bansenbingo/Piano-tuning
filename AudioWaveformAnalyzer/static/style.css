@@ -207,7 +207,7 @@ input[type="file"]::file-selector-button {
   border: 0;
   border-radius: 7px;
   background: var(--navy);
-  color: #ffffff;
+  color: #ffffff !important;
   color: var(--secondary-foreground);
   font-family: inherit;
   padding: 0.4rem 0.7rem;
@@ -272,12 +272,6 @@ input[type="range"] {
   height: 15px;
   accent-color: var(--primary);
   cursor: pointer;
-}
-
-.field-help {
-  margin: -0.75rem 0 1.15rem;
-  color: var(--muted-foreground);
-  font-size: 0.75rem;
 }
 
 .filter-cuts {
