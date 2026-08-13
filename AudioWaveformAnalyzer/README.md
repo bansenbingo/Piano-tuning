@@ -26,7 +26,9 @@ visualizations work without an external CDN.
 
 ## Current scope
 
-- Upload-only WAV input.
+- Upload-only WAV/M4A input. M4A is automatically decoded to a temporary
+  uncompressed 32-bit float WAV before entering the same filtering and
+  decomposition workflow.
 - A zero-phase Butterworth band-pass filter removes low-frequency rumble and
   high-frequency hiss before decomposition. The low/high cutoffs are adjustable
   in the UI and default to 20 Hz and 12 kHz for single-note piano recordings.
@@ -52,5 +54,6 @@ python tools/convert_audio_to_wav.py data/piano data/piano_wav
 ```
 
 M4A/AAC is already lossy before conversion; converting it to WAV cannot restore
-information removed by AAC, but it avoids adding another lossy generation. Once
-converted, upload the resulting WAV file through the web UI.
+information removed by AAC, but it avoids adding another lossy generation. The
+web UI accepts M4A directly and removes its temporary converted WAV after
+analysis.

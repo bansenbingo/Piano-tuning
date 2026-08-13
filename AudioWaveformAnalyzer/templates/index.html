@@ -14,7 +14,7 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <div class="brand-text">
           <h1>音频波形 · 正弦波分解</h1>
-          <p>上传 WAV，经过降噪滤波后用傅立叶变换拆分正弦波并写出函数解析式</p>
+          <p>上传 WAV/M4A，自动转为 WAV 后降噪、拆分正弦波并写出函数解析式</p>
         </div>
       </div>
       <span class="version">v2.4</span>
@@ -25,8 +25,9 @@
         <h2>分析设置</h2>
 
         <div class="field">
-          <label for="file-input">上传 WAV 文件</label>
-          <input type="file" id="file-input" accept=".wav,audio/wav,audio/x-wav" required>
+          <label for="file-input">上传 WAV 或 M4A 文件</label>
+          <input type="file" id="file-input" accept=".wav,.m4a,audio/wav,audio/x-wav,audio/mp4,audio/x-m4a" required>
+          <p id="file-help" class="field-help">支持 WAV / M4A · M4A 会自动转换为 WAV</p>
         </div>
 
         <fieldset class="filter-group">
@@ -62,7 +63,7 @@
       <section class="content">
         <section id="empty-state" class="panel empty">
           <h2>等待分析</h2>
-          <p>上传一个 WAV 文件，设置正弦波数量与降噪选项，然后点击“开始分析”。</p>
+          <p>上传一个 WAV 或 M4A 文件；M4A 会自动转换为 WAV 后进入相同分析流程。</p>
         </section>
 
         <section id="results" class="results" hidden>

@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 from pathlib import Path
+
+from analyzer.conversion import convert_to_wav
 
 SUPPORTED_SUFFIXES = {".m4a", ".mp3", ".wav"}
 
@@ -12,27 +13,7 @@ SUPPORTED_SUFFIXES = {".m4a", ".mp3", ".wav"}
 def convert_file(source: Path, destination: Path, *, overwrite: bool = False) -> None:
     """Decode one file to WAV while retaining its source rate and channel count."""
 
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    command = [
-        "ffmpeg",
-        "-hide_banner",
-        "-loglevel",
-        "error",
-        "-y" if overwrite else "-n",
-        "-i",
-        str(source),
-        "-map",
-        "0:a:0",
-        "-vn",
-        "-sn",
-        "-dn",
-        "-c:a",
-        "pcm_f32le",
-        "-map_metadata",
-        "0",
-        str(destination),
-    ]
-    subprocess.run(command, check=True)
+    convert_to_wav(source, destination, overwrite=overwrite)
 
 
 def convert_directory(source_dir: Path, destination_dir: Path, *, overwrite: bool = False) -> int:

@@ -12,6 +12,7 @@ const PALETTE = [
 ];
 
 const fileInput = document.querySelector("#file-input");
+const fileHelp = document.querySelector("#file-help");
 const denoiseToggle = document.querySelector("#denoise");
 const lowcutInput = document.querySelector("#lowcut");
 const highcutInput = document.querySelector("#highcut");
@@ -42,6 +43,7 @@ function renderResults(payload) {
 
   metaTitle.textContent = `分析结果：${payload.filename}`;
   const chips = [
+    payload.converted_to_wav ? "M4A → WAV" : "WAV",
     `${payload.sample_rate} Hz`,
     `${Number(payload.duration).toFixed(3)} s`,
     `${payload.num_samples} 采样`,
@@ -88,7 +90,7 @@ function renderResults(payload) {
 
 async function analyze() {
   if (fileInput.files.length === 0) {
-    status.textContent = "请先上传一个 WAV 文件。";
+    status.textContent = "请先上传一个 WAV 或 M4A 文件。";
     return;
   }
 
@@ -118,3 +120,9 @@ numComponents.addEventListener("input", () => {
   numValue.textContent = numComponents.value;
 });
 analyzeBtn.addEventListener("click", analyze);
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  fileHelp.textContent = file
+    ? `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`
+    : "支持 WAV / M4A · M4A 会自动转换为 WAV";
+});

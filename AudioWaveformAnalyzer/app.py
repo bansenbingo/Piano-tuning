@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import tempfile
 from pathlib import Path
 
 import plotly
@@ -10,6 +11,7 @@ from flask import Flask, jsonify, render_template, request, send_file
 from werkzeug.utils import secure_filename
 
 from analyzer.audio_io import AudioReadError, read_wav_mono
+from analyzer.conversion import AudioConversionError, convert_to_wav
 from analyzer.decomposition import DecompositionError, decompose
 from analyzer.filtering import FilterError, denoise
 from analyzer.visualization import (
@@ -24,6 +26,7 @@ UPLOAD_DIR = PROJECT_DIR / "data" / "uploads"
 PLOTLY_JS = Path(plotly.__file__).parent / "package_data" / "plotly.min.js"
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+SUPPORTED_UPLOAD_EXTENSIONS = {".wav", ".m4a"}
 
 
 def create_app() -> Flask:
@@ -54,17 +57,25 @@ def create_app() -> Flask:
 
         upload = request.files.get("file")
         if upload is None or not upload.filename:
-            return jsonify({"error": "A WAV file is required."}), 400
+            return jsonify({"error": "A WAV or M4A file is required."}), 400
 
         filename = secure_filename(upload.filename)
-        if not filename.lower().endswith(".wav"):
-            filename = f"{filename}.wav"
+        extension = Path(filename).suffix.lower()
+        if extension not in SUPPORTED_UPLOAD_EXTENSIONS:
+            return jsonify({"error": "Only WAV and M4A files are supported."}), 400
         path = UPLOAD_DIR / filename
         upload.save(path)
 
+        converted = extension == ".m4a"
         try:
-            signal_mono, sample_rate = read_wav_mono(path)
-        except AudioReadError as exc:
+            if converted:
+                with tempfile.TemporaryDirectory(dir=UPLOAD_DIR, prefix="m4a_to_wav_") as temp_dir:
+                    wav_path = Path(temp_dir) / f"{Path(filename).stem}.wav"
+                    convert_to_wav(path, wav_path)
+                    signal_mono, sample_rate = read_wav_mono(wav_path)
+            else:
+                signal_mono, sample_rate = read_wav_mono(path)
+        except (AudioConversionError, AudioReadError) as exc:
             return jsonify({"error": str(exc)}), 400
 
         filter_enabled = request.form.get("denoise", "1").lower() in {"1", "true", "on", "yes"}
@@ -103,6 +114,9 @@ def create_app() -> Flask:
         return jsonify(
             {
                 "filename": filename,
+                "input_format": extension.lstrip("."),
+                "converted_to_wav": converted,
+                "processing_format": "wav",
                 "sample_rate": sample_rate,
                 "num_samples": int(signal_mono.size),
                 "duration": round(signal_mono.size / sample_rate, 6),
