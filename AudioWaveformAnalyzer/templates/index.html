@@ -3,22 +3,100 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Audio Waveform Analyzer</title>
+    <title>音频波形 · 正弦波分解</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23d8f249' stroke='%231a1f2c'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('plotly_js') }}"></script>
   </head>
   <body>
-    <main class="container">
-      <h1>Audio Waveform Analyzer</h1>
-      <p class="intro">2.0 工程初始化：钢琴音频样本目录</p>
-      <section class="card">
-        <h2>样本库</h2>
-        <p>当前录入的 M4A 钢琴音频将作为后续波形、FFT 和正弦波拟合的测试数据。</p>
-        <table>
-          <thead><tr><th>文件</th><th>编码</th><th>采样率</th><th>声道</th><th>时长</th></tr></thead>
-          <tbody id="samples"><tr><td colspan="5">正在读取样本目录…</td></tr></tbody>
-        </table>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div class="brand-text">
+          <h1>音频波形 · 正弦波分解</h1>
+          <p>上传 WAV，经过降噪滤波后用傅立叶变换拆分正弦波并写出函数解析式</p>
+        </div>
+      </div>
+      <span class="version">v2.4</span>
+    </header>
+
+    <main class="layout">
+      <aside class="panel controls">
+        <h2>分析设置</h2>
+
+        <div class="field">
+          <label for="file-input">上传 WAV 文件</label>
+          <input type="file" id="file-input" accept=".wav,audio/wav,audio/x-wav" required>
+        </div>
+
+        <fieldset class="filter-group">
+          <legend>降噪滤波</legend>
+          <label class="toggle">
+            <input type="checkbox" id="denoise" checked>
+            <span>启用降噪（钢琴单音）</span>
+          </label>
+          <div class="filter-cuts">
+            <div class="field">
+              <label for="lowcut">低频截止 (Hz)</label>
+              <input type="number" id="lowcut" value="20" min="1" step="1">
+            </div>
+            <div class="field">
+              <label for="highcut">高频截止 (Hz)</label>
+              <input type="number" id="highcut" value="12000" min="1" step="1">
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <div class="field-head">
+            <label for="num-components">正弦波数量</label>
+            <output id="num-value" for="num-components">5</output>
+          </div>
+          <input type="range" id="num-components" min="1" max="50" value="5" step="1">
+        </div>
+
+        <button id="analyze-btn" class="primary">开始分析</button>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </aside>
+
+      <section class="content">
+        <section id="empty-state" class="panel empty">
+          <h2>等待分析</h2>
+          <p>上传一个 WAV 文件，设置正弦波数量与降噪选项，然后点击“开始分析”。</p>
+        </section>
+
+        <section id="results" class="results" hidden>
+          <section class="panel meta">
+            <div class="meta-head">
+              <h2 id="meta-title">分析结果</h2>
+              <div class="chips" id="meta-chips"></div>
+            </div>
+            <div class="expression">
+              <div class="expression-label">拟合函数解析式</div>
+              <code id="expression"></code>
+            </div>
+            <details class="components-list">
+              <summary>查看各正弦波分量</summary>
+              <ul id="component-list"></ul>
+            </details>
+          </section>
+
+          <section class="panel plot-panel" id="denoise-panel" hidden>
+            <div id="denoise-plot" class="plot"></div>
+          </section>
+          <section class="panel plot-panel">
+            <div id="wave-plot" class="plot"></div>
+          </section>
+          <section class="panel plot-panel">
+            <div id="spectrum-plot" class="plot"></div>
+          </section>
+          <section class="panel plot-panel">
+            <div id="components-plot" class="plot"></div>
+          </section>
+        </section>
       </section>
     </main>
+
     <script src="{{ url_for('static', filename='app.js') }}"></script>
   </body>
 </html>

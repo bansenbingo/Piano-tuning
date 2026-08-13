@@ -5,13 +5,25 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template
+import plotly
+from flask import Flask, jsonify, render_template, request, send_file
+from werkzeug.utils import secure_filename
 
-from analyzer.audio_io import AudioProbeError, list_audio_files
-
+from analyzer.audio_io import AudioReadError, read_wav_mono
+from analyzer.decomposition import DecompositionError, decompose
+from analyzer.filtering import FilterError, denoise
+from analyzer.visualization import (
+    build_components_figure,
+    build_denoise_figure,
+    build_spectrum_figure,
+    build_wave_figure,
+)
 
 PROJECT_DIR = Path(__file__).resolve().parent
-PIANO_DIR = PROJECT_DIR / "data" / "piano"
+UPLOAD_DIR = PROJECT_DIR / "data" / "uploads"
+PLOTLY_JS = Path(plotly.__file__).parent / "package_data" / "plotly.min.js"
+
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def create_app() -> Flask:
@@ -27,14 +39,85 @@ def create_app() -> Flask:
 
     @app.get("/health")
     def health():
-        return jsonify({"status": "ok", "version": "2.2.0"})
+        return jsonify({"status": "ok", "version": "2.4.0"})
 
-    @app.get("/api/samples")
-    def samples():
+    @app.get("/vendor/plotly.min.js")
+    def plotly_js():
+        return send_file(PLOTLY_JS, mimetype="application/javascript", max_age=3600)
+
+    @app.post("/api/analyze")
+    def analyze():
         try:
-            return jsonify({"samples": list_audio_files(PIANO_DIR)})
-        except (AudioProbeError, FileNotFoundError) as exc:
-            return jsonify({"error": str(exc)}), 503
+            num_components = int(request.form.get("num_components", "5"))
+        except ValueError:
+            return jsonify({"error": "num_components must be an integer."}), 400
+
+        upload = request.files.get("file")
+        if upload is None or not upload.filename:
+            return jsonify({"error": "A WAV file is required."}), 400
+
+        filename = secure_filename(upload.filename)
+        if not filename.lower().endswith(".wav"):
+            filename = f"{filename}.wav"
+        path = UPLOAD_DIR / filename
+        upload.save(path)
+
+        try:
+            signal_mono, sample_rate = read_wav_mono(path)
+        except AudioReadError as exc:
+            return jsonify({"error": str(exc)}), 400
+
+        filter_enabled = request.form.get("denoise", "1").lower() in {"1", "true", "on", "yes"}
+        try:
+            lowcut_hz = float(request.form.get("lowcut", "20"))
+            highcut_hz = float(request.form.get("highcut", "12000"))
+        except ValueError:
+            return jsonify({"error": "Filter cutoff frequencies must be numbers."}), 400
+
+        try:
+            filtered_signal = (
+                denoise(signal_mono, sample_rate, lowcut_hz, highcut_hz)
+                if filter_enabled
+                else signal_mono
+            )
+            result = decompose(filtered_signal, sample_rate, num_components)
+        except (FilterError, DecompositionError) as exc:
+            return jsonify({"error": str(exc)}), 422
+
+        figures = {
+            "wave": build_wave_figure(
+                result["sample_rate"], result["signal"], result["reconstruction"]
+            ),
+            "spectrum": build_spectrum_figure(
+                result["sample_rate"],
+                result["signal"],
+                [component["frequency"] for component in result["components"]],
+            ),
+            "components": build_components_figure(
+                result["sample_rate"], result["component_waves"], result["components"]
+            ),
+        }
+        if filter_enabled:
+            figures["denoise"] = build_denoise_figure(sample_rate, signal_mono, filtered_signal)
+
+        return jsonify(
+            {
+                "filename": filename,
+                "sample_rate": sample_rate,
+                "num_samples": int(signal_mono.size),
+                "duration": round(signal_mono.size / sample_rate, 6),
+                "analysis_sample_rate": round(float(result["sample_rate"]), 3),
+                "num_components": len(result["components"]),
+                "components": result["components"],
+                "expression": result["expression"],
+                "filter": {
+                    "enabled": filter_enabled,
+                    "lowcut_hz": lowcut_hz,
+                    "highcut_hz": min(highcut_hz, 0.95 * sample_rate / 2),
+                },
+                "figures": {name: fig.to_plotly_json() for name, fig in figures.items()},
+            }
+        )
 
     return app
 

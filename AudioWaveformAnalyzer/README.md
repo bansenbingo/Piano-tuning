@@ -1,12 +1,9 @@
 # Audio Waveform Analyzer
 
-Version 2.0 initializes the Python project for the audio-analysis work on the
-`audio-waveform-analysis` branch.
-
-The sample library in `data/piano/` contains the supplied piano-note recordings
-in their original `.m4a` format. The application uses FFmpeg/ffprobe to inspect
-and decode M4A/MP3 input, and NumPy/SciPy for later waveform, FFT, and sinusoidal
-fitting features.
+Flask web application that uploads a WAV file, applies a zero-phase band-pass
+noise filter, then uses the Fourier transform to locate the most energetic
+frequencies and fits each one to a sine wave. The fitted components are
+reported as an analytical function expression and visualized interactively.
 
 ## Local setup
 
@@ -17,30 +14,37 @@ conda activate audio-waveform-analyzer
 python app.py
 ```
 
-Open <http://127.0.0.1:5000/> after the server starts.
+Open <http://127.0.0.1:5000/> after the server starts. If port 5000 is already
+in use (macOS AirPlay commonly occupies it), choose another port:
 
-FFmpeg and `ffprobe` must be available on `PATH` for `.m4a` and `.mp3` files.
+```bash
+FLASK_PORT=5001 python app.py
+```
 
-The environment file installs Python and FFmpeg through conda-forge. Python
-packages declared in `pyproject.toml`, including Plotly for interactive plots,
-are installed with pip as part of environment creation.
+Plotly.js is served locally from the installed Plotly package, so the
+visualizations work without an external CDN.
 
 ## Current scope
 
-- Flask app skeleton with a health endpoint and piano-sample catalog.
-- M4A sample inventory and metadata inspection through `ffprobe`.
-- Lossless-after-decoding 32-bit float WAV copies in `data/piano_wav/`; the
-  original M4A files remain unchanged.
-- Reserved directories for uploaded files, generated analysis results, and
-  technical documents under the repository-level `Reference/` directory.
-
-FFT decomposition, curve fitting, plots, and export are planned for subsequent
-`2.x` feature commits.
+- Upload-only WAV input.
+- A zero-phase Butterworth band-pass filter removes low-frequency rumble and
+  high-frequency hiss before decomposition. The low/high cutoffs are adjustable
+  in the UI and default to 20 Hz and 12 kHz for single-note piano recordings.
+- WAV decomposition into a configurable number of sine waves:
+  - Hann-windowed real FFT with `scipy.signal.find_peaks` picks the dominant
+    frequencies, refined to sub-bin accuracy by parabolic interpolation.
+  - A linear least-squares fit recovers each component's amplitude and phase,
+    then each component is written as `A·sin(2π·f·t + φ)`.
+- Interactive Plotly visualizations for the filtered versus raw waveform, the
+  filtered waveform versus its reconstruction, the spectrum with detected
+  peaks, and every individual component waveform.
+- A "fit function" panel that prints the summed analytical expression and each
+  component's expression.
 
 ## Converting audio to WAV
 
-The conversion keeps the source sample rate and channel count (no `-ar` or
-`-ac` conversion) and writes uncompressed `pcm_f32le` WAV files:
+If your recording is not yet a WAV file, convert it first (the source sample
+rate and channel count are preserved, and output is uncompressed `pcm_f32le`):
 
 ```bash
 conda activate audio-waveform-analyzer
@@ -48,4 +52,5 @@ python tools/convert_audio_to_wav.py data/piano data/piano_wav
 ```
 
 M4A/AAC is already lossy before conversion; converting it to WAV cannot restore
-information removed by AAC, but it avoids adding another lossy generation.
+information removed by AAC, but it avoids adding another lossy generation. Once
+converted, upload the resulting WAV file through the web UI.
