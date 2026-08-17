@@ -3,45 +3,58 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>音频波形 · 正弦波分解</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23d8f249' stroke='%231a1f2c'/%3E%3C/svg%3E">
+    <title>Piano Spectrum Workspace</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23181818'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('plotly_js') }}"></script>
   </head>
   <body>
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-index">00</span>
         <div class="brand-text">
-          <h1>音频波形 · 正弦波分解</h1>
-          <p>上传 WAV/M4A，自动转为 WAV 后降噪、拆分正弦波并写出函数解析式</p>
+          <h1>Piano Spectrum</h1>
+          <p>钢琴非谐频谱工作台</p>
         </div>
       </div>
-      <span class="version">v2.4</span>
+      <nav class="topnav" aria-label="工作区导航">
+        <a class="topnav-item active" href="#analysis-workspace" aria-current="page"><b>01</b> 分析</a>
+        <a class="topnav-item" href="#spectrum-section"><b>02</b> 频谱</a>
+        <a class="topnav-item" href="#waveform-section"><b>03</b> 波形</a>
+        <a class="topnav-item" href="#report-section"><b>04</b> 报告</a>
+      </nav>
+      <div class="topbar-meta">
+        <span class="system-state"><i aria-hidden="true"></i> LOCAL</span>
+        <span class="version">v2.5</span>
+      </div>
     </header>
 
     <main class="layout">
-      <aside class="panel controls">
-        <h2>分析设置</h2>
+      <aside class="controls">
+        <div class="section-title">
+          <span>§ 01</span>
+          <h2>分析设置</h2>
+          <small>/ INPUT</small>
+        </div>
 
         <div class="field">
-          <label for="file-input">上传 WAV 或 M4A 文件</label>
+          <label for="file-input">音频文件</label>
           <input type="file" id="file-input" accept=".wav,.m4a,audio/wav,audio/x-wav,audio/mp4,audio/x-m4a" required>
         </div>
 
         <fieldset class="filter-group">
-          <legend>降噪滤波</legend>
+          <legend>滤波参数</legend>
           <label class="toggle">
             <input type="checkbox" id="denoise" checked>
-            <span>启用降噪（钢琴单音）</span>
+            <span>启用钢琴单音降噪</span>
           </label>
           <div class="filter-cuts">
-            <div class="field">
-              <label for="lowcut">低频截止 (Hz)</label>
+            <div class="field compact">
+              <label for="lowcut">低频截止 / Hz</label>
               <input type="number" id="lowcut" value="20" min="1" step="1">
             </div>
-            <div class="field">
-              <label for="highcut">高频截止 (Hz)</label>
+            <div class="field compact">
+              <label for="highcut">高频截止 / Hz</label>
               <input type="number" id="highcut" value="12000" min="1" step="1">
             </div>
           </div>
@@ -49,49 +62,96 @@
 
         <div class="field">
           <div class="field-head">
-            <label for="num-components">正弦波数量</label>
+            <label for="num-components">泛音分量</label>
             <output id="num-value" for="num-components">5</output>
           </div>
           <input type="range" id="num-components" min="1" max="50" value="5" step="1">
         </div>
 
-        <button id="analyze-btn" class="primary">开始分析</button>
+        <button id="analyze-btn" class="primary" type="button"><span>RUN</span> 开始分析</button>
         <p id="status" class="status" role="status" aria-live="polite"></p>
+
+        <div class="controls-note">
+          <span>MODEL</span>
+          <code>fₙ = nF₀√(1 + Bn²)</code>
+        </div>
       </aside>
 
-      <section class="content">
-        <section id="empty-state" class="panel empty">
-          <h2>等待分析</h2>
-          <p>上传一个 WAV 或 M4A 文件；M4A 会自动转换为 WAV 后进入相同分析流程。</p>
+      <section class="content" id="analysis-workspace">
+        <div class="workspace-heading">
+          <span class="workspace-number">NO. 001</span>
+          <div>
+            <p>钢琴频谱分析 / WORKSPACE</p>
+            <h2>把声音拆成可以验证的参数。</h2>
+          </div>
+        </div>
+
+        <section id="empty-state" class="empty">
+          <div class="empty-index">READY / 00</div>
+          <h2>等待音频输入</h2>
+          <p>上传 WAV 或 M4A 文件，系统将执行转换、降噪、非谐频率估计与波形拟合。</p>
         </section>
 
         <section id="results" class="results" hidden>
-          <section class="panel meta">
-            <div class="meta-head">
+          <section class="meta panel-section">
+            <div class="section-title result-title">
+              <span>§ 02</span>
               <h2 id="meta-title">分析结果</h2>
-              <div class="chips" id="meta-chips"></div>
+              <small>/ RESULT</small>
             </div>
+            <div class="chips" id="meta-chips"></div>
             <div class="expression">
-              <div class="expression-label">拟合函数解析式</div>
+              <div class="expression-label">MODEL EXPRESSION</div>
               <code id="expression"></code>
             </div>
+            <section class="frequency-output" aria-labelledby="frequency-heading">
+              <div class="section-head">
+                <div>
+                  <h3 id="frequency-heading">各分量频率</h3>
+                  <p>按论文模型输出连续的非谐泛音分量。</p>
+                </div>
+                <button id="copy-frequencies" class="secondary" type="button">复制频率</button>
+              </div>
+              <ol id="frequency-list" class="frequency-list"></ol>
+            </section>
             <details class="components-list">
               <summary>查看各正弦波分量</summary>
               <ul id="component-list"></ul>
             </details>
+            <section class="markdown-output" id="report-section" aria-labelledby="markdown-heading">
+              <div class="section-head">
+                <div>
+                  <h3 id="markdown-heading">Markdown 分析报告</h3>
+                  <p>包含函数方程、频率、幅值和相位；不嵌入矢量图。</p>
+                </div>
+                <div class="report-actions">
+                  <button id="copy-markdown" class="secondary" type="button">复制 Markdown</button>
+                  <button id="download-markdown" class="secondary" type="button">下载 .md</button>
+                </div>
+              </div>
+              <textarea id="markdown-report" readonly spellcheck="false" aria-label="Markdown 分析报告"></textarea>
+            </section>
           </section>
 
-          <section class="panel plot-panel" id="denoise-panel" hidden>
+          <section class="plot-panel" id="denoise-panel" hidden>
+            <div class="plot-label">§ 03 / FILTER</div>
             <div id="denoise-plot" class="plot"></div>
           </section>
-          <section class="panel plot-panel">
+          <section class="plot-panel" id="waveform-section">
+            <div class="plot-label">§ 04 / WAVEFORM</div>
             <div id="wave-plot" class="plot"></div>
           </section>
-          <section class="panel plot-panel">
+          <section class="plot-panel" id="spectrum-section">
+            <div class="plot-label">§ 05 / SPECTRUM</div>
             <div id="spectrum-plot" class="plot"></div>
           </section>
-          <section class="panel plot-panel">
+          <section class="plot-panel">
+            <div class="plot-label">§ 06 / COMPONENTS</div>
             <div id="components-plot" class="plot"></div>
+          </section>
+          <section class="plot-panel">
+            <div class="plot-label">§ 07 / PHASOR</div>
+            <div id="phasor-plot" class="plot"></div>
           </section>
         </section>
       </section>

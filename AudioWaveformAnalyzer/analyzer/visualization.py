@@ -14,24 +14,24 @@ FONT_FAMILY = (
     "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', "
     "Roboto, 'Helvetica Neue', Arial, sans-serif"
 )
-FOREGROUND = "#1a1f2c"
-MUTED = "#6b7280"
-GRID = "#e7e9ec"
+FOREGROUND = "#181818"
+MUTED = "#777777"
+GRID = "#dedede"
 BACKGROUND = "#ffffff"
-ACCENT = "#d8f249"
-ORIGINAL = "#1a1f2c"
+ACCENT = "#737373"
+ORIGINAL = "#181818"
 
 PALETTE = [
-    "#d8f249",
-    "#2f80ed",
-    "#eb5757",
-    "#27ae60",
-    "#9b51e0",
-    "#f2994a",
-    "#00b8d9",
-    "#ff6b9d",
-    "#6b7280",
-    "#8d6e63",
+    "#181818",
+    "#525252",
+    "#737373",
+    "#a3a3a3",
+    "#303030",
+    "#626262",
+    "#858585",
+    "#b5b5b5",
+    "#454545",
+    "#919191",
 ]
 
 
@@ -146,16 +146,23 @@ def _spectrum(sample_rate: float, x: np.ndarray) -> tuple[np.ndarray, np.ndarray
 
 def build_spectrum_figure(sample_rate: float, x: np.ndarray, frequencies: list[float]) -> go.Figure:
     frequencies_axis, magnitude = _spectrum(sample_rate, x)
-    if magnitude.size > PLOT_MAX_POINTS:
-        indices = np.linspace(0, magnitude.size - 1, PLOT_MAX_POINTS).astype(int)
-        frequencies_axis = frequencies_axis[indices]
-        magnitude = magnitude[indices]
+    # Default to a piano-focused span so the detected partials do not collapse
+    # into a narrow strip next to the 20 kHz Nyquist range.
+    max_frequency = max(frequencies, default=0.0)
+    display_limit = min(sample_rate / 2.0, max(2_000.0, max_frequency * 1.25))
+    visible = frequencies_axis <= display_limit
+    display_frequencies = frequencies_axis[visible]
+    display_magnitude = magnitude[visible]
+    if display_magnitude.size > PLOT_MAX_POINTS:
+        indices = np.linspace(0, display_magnitude.size - 1, PLOT_MAX_POINTS).astype(int)
+        display_frequencies = display_frequencies[indices]
+        display_magnitude = display_magnitude[indices]
 
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
-            x=frequencies_axis,
-            y=magnitude,
+            x=display_frequencies,
+            y=display_magnitude,
             name="幅度谱",
             mode="lines",
             line={"color": ORIGINAL, "width": 1},
@@ -163,13 +170,7 @@ def build_spectrum_figure(sample_rate: float, x: np.ndarray, frequencies: list[f
     )
 
     if frequencies:
-        bin_width = float(sample_rate / x.size)
-        indices = np.clip(
-            np.rint(np.asarray(frequencies) / bin_width),
-            0,
-            magnitude.size - 1,
-        ).astype(int)
-        marker_magnitudes = [magnitude[int(index)] for index in indices]
+        marker_magnitudes = np.interp(frequencies, frequencies_axis, magnitude).tolist()
         fig.add_trace(
             go.Scatter(
                 x=frequencies,
@@ -186,6 +187,7 @@ def build_spectrum_figure(sample_rate: float, x: np.ndarray, frequencies: list[f
         yaxis_type="log",
         legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1},
     )
+    fig.update_xaxes(range=[0, display_limit])
     return _style(fig, "频谱与检测到的正弦波频率")
 
 
@@ -231,3 +233,34 @@ def build_components_figure(
         fig.update_xaxes(title_text="时间 (s)", row=count, col=1)
         fig.update_yaxes(title_text="幅值", row=(count + 1) // 2, col=1)
     return _style(fig, "拆分后的正弦波分量")
+
+
+def build_phasor_figure(components: list[dict[str, Any]]) -> go.Figure:
+    """Plot fitted sine waves as vectors whose magnitude and angle are A and phi."""
+
+    fig = go.Figure()
+    max_amplitude = max((float(component["amplitude"]) for component in components), default=1.0)
+    for component in components:
+        index = int(component["index"])
+        amplitude = float(component["amplitude"])
+        phase = float(component["phase"])
+        color = PALETTE[(index - 1) % len(PALETTE)]
+        real = amplitude * np.cos(phase)
+        imaginary = amplitude * np.sin(phase)
+        fig.add_trace(go.Scatter(
+            x=[0, real], y=[0, imaginary], mode="lines+markers+text",
+            name=f"#{index} · {float(component['frequency']):.3f} Hz",
+            text=[None, f"#{index}"], textposition="top right",
+            line={"color": color, "width": 2.5},
+            marker={"color": color, "size": [4, 8], "symbol": ["circle", "triangle-up"]},
+            hovertemplate=(f"分量 #{index}<br>频率：{float(component['frequency']):.6f} Hz"
+                           f"<br>幅值：{amplitude:.6f}<br>相位：{phase:.6f} rad<extra></extra>"),
+        ))
+    axis_limit = max_amplitude * 1.25 if max_amplitude > 0 else 1.0
+    fig.update_layout(
+        xaxis_title="实部（幅值 · cos(相位)）", yaxis_title="虚部（幅值 · sin(相位)）",
+        height=500, legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "left", "x": 0},
+    )
+    fig.update_xaxes(range=[-axis_limit, axis_limit], scaleanchor="y", scaleratio=1)
+    fig.update_yaxes(range=[-axis_limit, axis_limit])
+    return _style(fig, "分解正弦波相量矢量图")

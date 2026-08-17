@@ -39,9 +39,12 @@ visualizations work without an external CDN.
     then each component is written as `A·sin(2π·f·t + φ)`.
 - Interactive Plotly visualizations for the filtered versus raw waveform, the
   filtered waveform versus its reconstruction, the spectrum with detected
-  peaks, and every individual component waveform.
-- A "fit function" panel that prints the summed analytical expression and each
-  component's expression.
+  peaks, every individual component waveform, and an amplitude/phase phasor
+  vector diagram.
+- A separate frequency panel lists every fitted sine-wave frequency to six
+  decimal places and can copy the list to the clipboard.
+- A Markdown report panel can copy or download a self-contained `.md` report.
+  It contains the overall and per-component equations plus a frequency table.
 
 ## Converting audio to WAV
 

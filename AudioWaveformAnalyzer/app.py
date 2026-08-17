@@ -14,9 +14,11 @@ from analyzer.audio_io import AudioReadError, read_wav_mono
 from analyzer.conversion import AudioConversionError, convert_to_wav
 from analyzer.decomposition import DecompositionError, decompose
 from analyzer.filtering import FilterError, denoise
+from analyzer.reporting import build_markdown_report
 from analyzer.visualization import (
     build_components_figure,
     build_denoise_figure,
+    build_phasor_figure,
     build_spectrum_figure,
     build_wave_figure,
 )
@@ -42,7 +44,7 @@ def create_app() -> Flask:
 
     @app.get("/health")
     def health():
-        return jsonify({"status": "ok", "version": "2.4.0"})
+        return jsonify({"status": "ok", "version": "2.5.0"})
 
     @app.get("/vendor/plotly.min.js")
     def plotly_js():
@@ -107,6 +109,7 @@ def create_app() -> Flask:
             "components": build_components_figure(
                 result["sample_rate"], result["component_waves"], result["components"]
             ),
+            "phasor": build_phasor_figure(result["components"]),
         }
         if filter_enabled:
             figures["denoise"] = build_denoise_figure(sample_rate, signal_mono, filtered_signal)
@@ -122,8 +125,16 @@ def create_app() -> Flask:
                 "duration": round(signal_mono.size / sample_rate, 6),
                 "analysis_sample_rate": round(float(result["sample_rate"]), 3),
                 "num_components": len(result["components"]),
+                "model": result["model"],
                 "components": result["components"],
                 "expression": result["expression"],
+                "markdown_report": build_markdown_report(
+                    filename,
+                    result["components"],
+                    result["expression"],
+                    result["sample_rate"],
+                    signal_mono.size / sample_rate,
+                ),
                 "filter": {
                     "enabled": filter_enabled,
                     "lowcut_hz": lowcut_hz,

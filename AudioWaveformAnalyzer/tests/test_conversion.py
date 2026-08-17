@@ -28,3 +28,7 @@ def test_m4a_upload_is_converted_before_analysis():
     assert payload["converted_to_wav"] is True
     assert payload["processing_format"] == "wav"
     assert payload["num_components"] == 2
+    assert payload["model"]["formula"] == "f_n = n·F0·√(1 + B·n²)"
+    assert len(payload["components"]) == 2
+    assert "markdown_report" in payload and "<svg" not in payload["markdown_report"]
+    assert "phasor" in payload["figures"]

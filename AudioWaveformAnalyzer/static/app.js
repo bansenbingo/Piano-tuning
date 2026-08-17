@@ -26,7 +26,15 @@ const metaTitle = document.querySelector("#meta-title");
 const metaChips = document.querySelector("#meta-chips");
 const expression = document.querySelector("#expression");
 const componentList = document.querySelector("#component-list");
+const frequencyList = document.querySelector("#frequency-list");
+const markdownReport = document.querySelector("#markdown-report");
+const copyFrequenciesButton = document.querySelector("#copy-frequencies");
+const copyMarkdownButton = document.querySelector("#copy-markdown");
+const downloadMarkdownButton = document.querySelector("#download-markdown");
 const denoisePanel = document.querySelector("#denoise-panel");
+const navigationItems = [...document.querySelectorAll(".topnav-item")];
+
+let currentPayload = null;
 
 function escapeHtml(value) {
   return String(value).replace(
@@ -37,6 +45,7 @@ function escapeHtml(value) {
 }
 
 function renderResults(payload) {
+  currentPayload = payload;
   emptyState.hidden = true;
   results.hidden = false;
 
@@ -64,6 +73,14 @@ function renderResults(payload) {
       )}</li>`;
     })
     .join("");
+  frequencyList.innerHTML = payload.components
+    .map(
+      (component) =>
+        "<li><span>分量 #" + component.index + "</span><output>" +
+        Number(component.frequency).toFixed(6) + " Hz</output></li>",
+    )
+    .join("");
+  markdownReport.value = payload.markdown_report;
 
   const config = { responsive: true, displaylogo: false, modeBarButtonsToRemove: ["lasso2d"] };
   if (payload.figures.denoise) {
@@ -85,6 +102,40 @@ function renderResults(payload) {
     payload.figures.components.layout,
     config,
   );
+  Plotly.react("phasor-plot", payload.figures.phasor.data, payload.figures.phasor.layout, config);
+  window.requestAnimationFrame(() => {
+    document.querySelectorAll(".js-plotly-plot").forEach((plot) => Plotly.Plots.resize(plot));
+  });
+}
+
+function setActiveNavigation(item) {
+  navigationItems.forEach((navItem) => {
+    const active = navItem === item;
+    navItem.classList.toggle("active", active);
+    if (active) navItem.setAttribute("aria-current", "page");
+    else navItem.removeAttribute("aria-current");
+  });
+}
+
+async function copyText(value, successMessage) {
+  try {
+    await navigator.clipboard.writeText(value);
+    status.textContent = successMessage;
+  } catch (error) {
+    status.textContent = "无法访问剪贴板，请从文本框中手动复制。";
+  }
+}
+
+function downloadMarkdown() {
+  if (!currentPayload) return;
+  const name = currentPayload.filename.replace(/\.[^.]+$/, "") || "audio-analysis";
+  const blob = new Blob([markdownReport.value], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name + "-sinusoid-analysis.md";
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 async function analyze() {
@@ -118,4 +169,21 @@ async function analyze() {
 numComponents.addEventListener("input", () => {
   numValue.textContent = numComponents.value;
 });
+navigationItems.forEach((item) => {
+  item.addEventListener("click", () => setActiveNavigation(item));
+});
 analyzeBtn.addEventListener("click", analyze);
+copyFrequenciesButton.addEventListener("click", () => {
+  if (!currentPayload) return;
+  const frequencies = currentPayload.components
+    .map(
+      (component) =>
+        "#" + component.index + ": " + Number(component.frequency).toFixed(6) + " Hz",
+    )
+    .join("\n");
+  copyText(frequencies, "频率已复制。");
+});
+copyMarkdownButton.addEventListener("click", () => {
+  copyText(markdownReport.value, "Markdown 报告已复制。");
+});
+downloadMarkdownButton.addEventListener("click", downloadMarkdown);
