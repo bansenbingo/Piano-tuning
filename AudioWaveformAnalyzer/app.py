@@ -14,6 +14,7 @@ from analyzer.audio_io import AudioReadError, read_wav_mono
 from analyzer.conversion import AudioConversionError, convert_to_wav
 from analyzer.decomposition import DecompositionError, decompose
 from analyzer.filtering import FilterError, denoise
+from analyzer.repetitions import RepetitionError, combine_repeated_note, split_repeated_note
 from analyzer.reporting import build_markdown_report
 from analyzer.visualization import (
     build_components_figure,
@@ -44,7 +45,7 @@ def create_app() -> Flask:
 
     @app.get("/health")
     def health():
-        return jsonify({"status": "ok", "version": "2.5.0"})
+        return jsonify({"status": "ok", "version": "2.7.0"})
 
     @app.get("/vendor/plotly.min.js")
     def plotly_js():
@@ -54,8 +55,9 @@ def create_app() -> Flask:
     def analyze():
         try:
             num_components = int(request.form.get("num_components", "5"))
+            repetitions = int(request.form.get("repetitions", "1"))
         except ValueError:
-            return jsonify({"error": "num_components must be an integer."}), 400
+            return jsonify({"error": "Component and repeat counts must be integers."}), 400
 
         upload = request.files.get("file")
         if upload is None or not upload.filename:
@@ -88,13 +90,16 @@ def create_app() -> Flask:
             return jsonify({"error": "Filter cutoff frequencies must be numbers."}), 400
 
         try:
-            filtered_signal = (
-                denoise(signal_mono, sample_rate, lowcut_hz, highcut_hz)
+            split = split_repeated_note(signal_mono, sample_rate, repetitions)
+            raw_aggregate = combine_repeated_note(split["segments"], sample_rate)
+            processed_segments = (
+                [denoise(segment, sample_rate, lowcut_hz, highcut_hz) for segment in split["segments"]]
                 if filter_enabled
-                else signal_mono
+                else split["segments"]
             )
-            result = decompose(filtered_signal, sample_rate, num_components)
-        except (FilterError, DecompositionError) as exc:
+            aggregate = combine_repeated_note(processed_segments, sample_rate)
+            result = decompose(aggregate["signal"], sample_rate, num_components)
+        except (FilterError, RepetitionError, DecompositionError) as exc:
             return jsonify({"error": str(exc)}), 422
 
         figures = {
@@ -112,7 +117,9 @@ def create_app() -> Flask:
             "phasor": build_phasor_figure(result["components"]),
         }
         if filter_enabled:
-            figures["denoise"] = build_denoise_figure(sample_rate, signal_mono, filtered_signal)
+            figures["denoise"] = build_denoise_figure(
+                sample_rate, raw_aggregate["signal"], aggregate["signal"]
+            )
 
         return jsonify(
             {
@@ -123,6 +130,7 @@ def create_app() -> Flask:
                 "sample_rate": sample_rate,
                 "num_samples": int(signal_mono.size),
                 "duration": round(signal_mono.size / sample_rate, 6),
+                "analysis_duration": round(aggregate["signal"].size / sample_rate, 6),
                 "analysis_sample_rate": round(float(result["sample_rate"]), 3),
                 "num_components": len(result["components"]),
                 "model": result["model"],
@@ -133,8 +141,15 @@ def create_app() -> Flask:
                     result["components"],
                     result["expression"],
                     result["sample_rate"],
-                    signal_mono.size / sample_rate,
+                    aggregate["signal"].size / sample_rate,
                 ),
+                "repetitions": {
+                    "requested": repetitions,
+                    "detected": len(split["segments"]),
+                    "onsets_seconds": [round(float(onset / sample_rate), 6) for onset in split["onsets"]],
+                    "segment_duration": round(split["segment_samples"] / sample_rate, 6),
+                    "aligned_duration": round(aggregate["signal"].size / sample_rate, 6),
+                },
                 "filter": {
                     "enabled": filter_enabled,
                     "lowcut_hz": lowcut_hz,

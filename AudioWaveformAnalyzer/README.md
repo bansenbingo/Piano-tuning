@@ -29,6 +29,12 @@ visualizations work without an external CDN.
 - Upload-only WAV/M4A input. M4A is automatically decoded to a temporary
   uncompressed 32-bit float WAV before entering the same filtering and
   decomposition workflow.
+- A recording can contain 1–32 repetitions of the same key. The analyser finds
+  each attack from a short-time RMS envelope, creates equal-length note segments,
+  filters each segment independently, aligns their attacks by normalized
+  cross-correlation, normalizes level, and takes a samplewise median before
+  decomposition. This suppresses one-off handling noise without combining
+  unrelated recording time spans.
 - A zero-phase Butterworth band-pass filter removes low-frequency rumble and
   high-frequency hiss before decomposition. The low/high cutoffs are adjustable
   in the UI and default to 20 Hz and 12 kHz for single-note piano recordings.

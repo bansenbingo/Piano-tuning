@@ -2,6 +2,7 @@
 *.raw
 .opencode/
 .DS_Store
+.conda/
 
 # Audio waveform analyzer runtime artifacts
 AudioWaveformAnalyzer/__pycache__/

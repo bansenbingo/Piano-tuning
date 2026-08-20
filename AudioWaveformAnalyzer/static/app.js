@@ -15,6 +15,7 @@ const fileInput = document.querySelector("#file-input");
 const denoiseToggle = document.querySelector("#denoise");
 const lowcutInput = document.querySelector("#lowcut");
 const highcutInput = document.querySelector("#highcut");
+const repetitionsInput = document.querySelector("#repetitions");
 const numComponents = document.querySelector("#num-components");
 const numValue = document.querySelector("#num-value");
 const analyzeBtn = document.querySelector("#analyze-btn");
@@ -57,6 +58,10 @@ function renderResults(payload) {
     `${payload.num_samples} 采样`,
     `${payload.num_components} 个正弦波`,
   ];
+  if (payload.repetitions.requested > 1) {
+    chips.push(`${payload.repetitions.detected} 次单音已对齐`);
+    chips.push(`分析片段 ${Number(payload.repetitions.aligned_duration).toFixed(3)} s`);
+  }
   if (payload.filter.enabled) {
     chips.push(`降噪 ${payload.filter.lowcut_hz}–${payload.filter.highcut_hz} Hz`);
   }
@@ -150,6 +155,7 @@ async function analyze() {
   form.append("denoise", denoiseToggle.checked ? "1" : "0");
   form.append("lowcut", lowcutInput.value);
   form.append("highcut", highcutInput.value);
+  form.append("repetitions", repetitionsInput.value);
 
   analyzeBtn.disabled = true;
   status.textContent = "正在分析…";
