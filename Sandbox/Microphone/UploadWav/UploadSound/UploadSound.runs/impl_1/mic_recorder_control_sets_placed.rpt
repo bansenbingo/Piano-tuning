@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Sat Jul 25 20:44:34 2026
+| Date         : Fri Aug  7 11:40:28 2026
 | Host         : LAPTOP-6STAFKCC running 64-bit major release  (build 9200)
 | Command      : report_control_sets -verbose -file mic_recorder_control_sets_placed.rpt
 | Design       : mic_recorder
@@ -58,12 +58,12 @@ Table of Contents
 +--------------+-----------------------+------------------------+-----------------+--------------+
 | Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
 +--------------+-----------------------+------------------------+-----------------+--------------+
-| No           | No                    | No                     |               9 |            8 |
+| No           | No                    | No                     |               9 |            7 |
 | No           | No                    | Yes                    |               8 |            2 |
-| No           | Yes                   | No                     |             105 |           34 |
+| No           | Yes                   | No                     |             105 |           37 |
 | Yes          | No                    | No                     |               8 |            3 |
 | Yes          | No                    | Yes                    |               0 |            0 |
-| Yes          | Yes                   | No                     |              96 |           25 |
+| Yes          | Yes                   | No                     |              96 |           26 |
 +--------------+-----------------------+------------------------+-----------------+--------------+
 
 
@@ -74,21 +74,21 @@ Table of Contents
 |     Clock Signal     |            Enable Signal            |          Set/Reset Signal         | Slice Load Count | Bel Load Count | Bels / Slice |
 +----------------------+-------------------------------------+-----------------------------------+------------------+----------------+--------------+
 |  CLK100MHZ_IBUF_BUFG |                                     | u_pdm_decoder/mclk_cnt[5]_i_1_n_0 |                2 |              6 |         3.00 |
-|  CLK100MHZ_IBUF_BUFG | u_pdm_decoder/m_data_sample         | u_uart_tx/AR[0]                   |                1 |              7 |         7.00 |
+|  CLK100MHZ_IBUF_BUFG | u_pdm_decoder/m_data_sample         | u_uart_tx/AR[0]                   |                3 |              7 |         2.33 |
 |  CLK100MHZ_IBUF_BUFG | u_pdm_decoder/m_data_sample         | u_pdm_decoder/ones_cnt[7]_i_1_n_0 |                2 |              8 |         4.00 |
-|  CLK100MHZ_IBUF_BUFG | u_pdm_decoder/pcm_sample[7]_i_1_n_0 | u_uart_tx/AR[0]                   |                3 |              8 |         2.67 |
+|  CLK100MHZ_IBUF_BUFG | u_pdm_decoder/pcm_sample[7]_i_1_n_0 | u_uart_tx/AR[0]                   |                2 |              8 |         4.00 |
 |  CLK100MHZ_IBUF_BUFG | u_uart_tx/div_cnt_0                 | u_uart_tx/AR[0]                   |                2 |              8 |         4.00 |
-|  CLK100MHZ_IBUF_BUFG | u_uart_tx/E[0]                      |                                   |                3 |              8 |         2.67 |
 |  CLK100MHZ_IBUF_BUFG | u_uart_tx/shift_reg                 | u_uart_tx/AR[0]                   |                2 |              8 |         4.00 |
-|  CLK100MHZ_IBUF_BUFG |                                     |                                   |                8 |              9 |         1.12 |
+|  CLK100MHZ_IBUF_BUFG | u_uart_tx/E[0]                      |                                   |                3 |              8 |         2.67 |
+|  CLK100MHZ_IBUF_BUFG |                                     |                                   |                7 |              9 |         1.29 |
 |  CLK100MHZ_IBUF_BUFG |                                     | sample_timer[0]_i_1_n_0           |                4 |             13 |         3.25 |
-|  CLK100MHZ_IBUF_BUFG | u_pdm_decoder/sel                   | record_count[0]_i_1_n_0           |                5 |             19 |         3.80 |
-|  CLK100MHZ_IBUF_BUFG | u_uart_tx/send_issued_reg_0         | send_count[0]_i_1_n_0             |                5 |             19 |         3.80 |
 |  CLK100MHZ_IBUF_BUFG | play_count                          | play_count[0]_i_1_n_0             |                5 |             19 |         3.80 |
+|  CLK100MHZ_IBUF_BUFG | u_pdm_decoder/buf_we                | record_count[0]_i_1_n_0           |                5 |             19 |         3.80 |
+|  CLK100MHZ_IBUF_BUFG | u_uart_tx/send_issued_reg           | send_count[0]_i_1_n_0             |                5 |             19 |         3.80 |
 |  CLK100MHZ_IBUF_BUFG |                                     | sw_14_debounce_count[0]_i_1_n_0   |                5 |             20 |         4.00 |
 |  CLK100MHZ_IBUF_BUFG |                                     | sw_0_debounce_count[0]_i_1_n_0    |                5 |             20 |         4.00 |
 |  CLK100MHZ_IBUF_BUFG |                                     | sw_15_debounce_count[0]_i_1_n_0   |                5 |             20 |         4.00 |
-|  CLK100MHZ_IBUF_BUFG |                                     | u_uart_tx/AR[0]                   |               15 |             34 |         2.27 |
+|  CLK100MHZ_IBUF_BUFG |                                     | u_uart_tx/AR[0]                   |               18 |             34 |         1.89 |
 +----------------------+-------------------------------------+-----------------------------------+------------------+----------------+--------------+
 
 

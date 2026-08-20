@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date             : Sat Jul 25 20:45:04 2026
+| Date             : Fri Aug  7 11:40:57 2026
 | Host             : LAPTOP-6STAFKCC running 64-bit major release  (build 9200)
 | Command          : report_power -file mic_recorder_power_routed.rpt -pb mic_recorder_power_summary_routed.pb -rpx mic_recorder_power_routed.rpx
 | Design           : mic_recorder
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.145        |
+| Total On-Chip Power (W)  | 0.141        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.045        |
+| Dynamic (W)              | 0.041        |
 | Device Static (W)        | 0.100        |
 | Effective TJA (C/W)      | 4.6          |
-| Max Ambient (C)          | 84.3         |
-| Junction Temperature (C) | 25.7         |
+| Max Ambient (C)          | 84.4         |
+| Junction Temperature (C) | 25.6         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,17 +52,17 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Clocks         |     0.003 |        3 |       --- |             --- |
-| Slice Logic    |    <0.001 |      624 |       --- |             --- |
-|   LUT as Logic |    <0.001 |      268 |     63400 |            0.42 |
+| Clocks         |     0.004 |        3 |       --- |             --- |
+| Slice Logic    |    <0.001 |      730 |       --- |             --- |
+|   LUT as Logic |    <0.001 |      328 |     63400 |            0.52 |
 |   CARRY4       |    <0.001 |       47 |     15850 |            0.30 |
 |   Register     |    <0.001 |      226 |    126800 |            0.18 |
 |   Others       |     0.000 |       10 |       --- |             --- |
-| Signals        |     0.001 |      599 |       --- |             --- |
+| Signals        |     0.001 |      702 |       --- |             --- |
 | Block RAM      |     0.030 |       64 |       135 |           47.41 |
-| I/O            |     0.010 |       27 |       210 |           12.86 |
+| I/O            |     0.006 |       27 |       210 |           12.86 |
 | Static Power   |     0.100 |          |           |                 |
-| Total          |     0.145 |          |           |                 |
+| Total          |     0.141 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -72,9 +72,9 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.049 |       0.032 |      0.017 |       NA    | Unspecified | NA         |
-| Vccaux    |       1.800 |     0.019 |       0.000 |      0.018 |       NA    | Unspecified | NA         |
-| Vcco33    |       3.300 |     0.007 |       0.003 |      0.004 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.050 |       0.033 |      0.017 |       NA    | Unspecified | NA         |
+| Vccaux    |       1.800 |     0.018 |       0.000 |      0.018 |       NA    | Unspecified | NA         |
+| Vcco33    |       3.300 |     0.006 |       0.002 |      0.004 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco18    |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco15    |       1.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -141,8 +141,8 @@ Table of Contents
 +------------------+-----------+
 | Name             | Power (W) |
 +------------------+-----------+
-| mic_recorder     |     0.045 |
-|   u_audio_buffer |     0.031 |
+| mic_recorder     |     0.041 |
+|   u_audio_buffer |     0.032 |
 +------------------+-----------+
 
 

@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Sat Jul 25 20:45:03 2026
+| Date         : Fri Aug  7 11:40:57 2026
 | Host         : LAPTOP-6STAFKCC running 64-bit major release  (build 9200)
 | Command      : report_methodology -file mic_recorder_methodology_drc_routed.rpt -pb mic_recorder_methodology_drc_routed.pb -rpx mic_recorder_methodology_drc_routed.rpx
 | Design       : mic_recorder

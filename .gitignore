@@ -1,3 +1,5 @@
+*.wav
+*.raw
 .opencode/
 .DS_Store
 
