@@ -2,3 +2,16 @@
 *.raw
 .opencode/
 .DS_Store
+.conda/
+
+# Audio waveform analyzer runtime artifacts
+AudioWaveformAnalyzer/__pycache__/
+AudioWaveformAnalyzer/analyzer/__pycache__/
+AudioWaveformAnalyzer/tests/__pycache__/
+AudioWaveformAnalyzer/tools/__pycache__/
+AudioWaveformAnalyzer/*.egg-info/
+AudioWaveformAnalyzer/data/uploads/*
+AudioWaveformAnalyzer/data/piano_wav/*
+AudioWaveformAnalyzer/outputs/*
+!AudioWaveformAnalyzer/data/uploads/.gitkeep
+!AudioWaveformAnalyzer/outputs/.gitkeep
